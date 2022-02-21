@@ -48,10 +48,11 @@ void MainWindow::Download()
             HttpDownloader * downloader = new HttpDownloader;
             downloader->file_path = config->Get("default_path").toString();
             downloader->url = url;
+            downloader->GetFileNameFromUrl();
             DownloadInfDialog dialog(downloader,this);
             if(dialog.exec()==QDialog::Accepted)
             {
-                   downloader->Download();
+                   downloader->Start();
             }
             else
             {
