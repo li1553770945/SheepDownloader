@@ -11,13 +11,13 @@ Config::Config()
 {
 
 }
-std::string Config::Get(std::string key)
+QJsonValue Config::Get(QString key)
 {
-    return object.value(QString::fromStdString(key)).toString().toStdString();
+    return object.value(key);
 }
-int Config::Set(std::string key, std::string value)
+int Config::Set(QString key, QString value)
 {
-    object.insert(QString::fromStdString(key),QString::fromStdString(value));
+    object.insert(key,value);
     return 0;
 }
 int Config::Read()
@@ -52,11 +52,9 @@ int Config::Read()
 int Config::Save()
 {
     QJsonDocument doc;
-    QJsonArray array;
-    array.append(object);
-    doc.setArray(array);
-    QByteArray data = doc.toJson();//也不知道为什么要这么复杂的操作
 
+    doc.setObject(object);
+    QByteArray data = doc.toJson();//也不知道为什么要这么复杂的操作
     QFile file("config.json");//json写入文件
     file.open(QIODevice::WriteOnly);
     file.write(data);

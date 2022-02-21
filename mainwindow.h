@@ -16,10 +16,13 @@ public:
     ~MainWindow();
 
 private:
+    void InitConfig();
+    void Download();
     Ui::MainWindow *ui;
     SettingWindow* setting_window;
 
 private slots:
     void on_SettingAction_triggered();
+    void on_DownloadButton_clicked();
 };
 #endif // MAINWINDOW_H
