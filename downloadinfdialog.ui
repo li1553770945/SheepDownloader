@@ -24,7 +24,11 @@
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="UrlLineEdit"/>
+      <widget class="QLineEdit" name="UrlLineEdit">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -53,6 +57,13 @@
      </item>
      <item>
       <widget class="QLineEdit" name="SavePathLineEdit"/>
+     </item>
+     <item>
+      <widget class="QPushButton" name="SelectPathButton">
+       <property name="text">
+        <string>选择</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>

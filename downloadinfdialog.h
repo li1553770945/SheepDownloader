@@ -22,6 +22,7 @@ private slots:
     void on_UrlLineEdit_textChanged( const QString &text );
     void on_FileNameLineEdit_textChanged( const QString &text );
     void on_SavePathLineEdit_textChanged( const QString &text );
+    void on_SelectPathButton_clicked();
 };
 
 #endif // DOWNLOADINFDIALOG_H

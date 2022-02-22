@@ -1,11 +1,16 @@
 #ifndef DOWNLOADER_H
 #define DOWNLOADER_H
 #include <QString>
-class Downloader{
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QFile>
+class Downloader:public QObject{
+    Q_OBJECT
 public:
     QString url;
     QString file_name;
     QString file_path;
+    QFile file;
     int state;
     Downloader();
     virtual ~Downloader();
@@ -14,12 +19,17 @@ public:
     virtual long GetTotalFileLenth() = 0;             //获取将要下载的文件长度
     virtual long GetLocalFileLenth() = 0;         //获取本地文件长度
     virtual int GetFileNameFromUrl() = 0;      //从URL中获取文件名
-    virtual int CreateDir();       //是否在本地创建目录，没有就创建
+    virtual int CreateFile();       //创建
+public slots:
+    virtual void DownloadFinished(QNetworkReply * reply)=0;
 
 
 
 };
 class HttpDownloader:public Downloader{
+    Q_OBJECT
+    QNetworkAccessManager d_manager;
+    QNetworkReply *d_reply;
   public:
     HttpDownloader();
     ~HttpDownloader();
@@ -28,6 +38,8 @@ class HttpDownloader:public Downloader{
     long GetTotalFileLenth() ;
     long GetLocalFileLenth() ;
     int GetFileNameFromUrl();
+public slots:
+    void DownloadFinished(QNetworkReply *);
 };
 
 #endif // DOWNLOADER_H

@@ -22,5 +22,8 @@ private:
 
 private slots:
     void on_SaveButton_clicked();
+    void on_SelectSavePath_clicked();
+    void on_SavePath_textChanged(const QString &);
+
 };
 #endif // SETTINGWINDOW_H

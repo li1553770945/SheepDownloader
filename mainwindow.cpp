@@ -54,10 +54,7 @@ void MainWindow::Download()
             {
                    downloader->Start();
             }
-            else
-            {
-                    delete downloader;
-            }
+
         }
         else
         {

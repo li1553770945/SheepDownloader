@@ -1,5 +1,6 @@
 #include "downloadinfdialog.h"
 #include "ui_downloadinfdialog.h"
+#include <QFileDialog>
 
 DownloadInfDialog::DownloadInfDialog(Downloader* _downloader,QWidget *parent) :
     QDialog(parent),
@@ -27,4 +28,13 @@ void DownloadInfDialog::on_FileNameLineEdit_textChanged( const QString &text )
 void DownloadInfDialog::on_SavePathLineEdit_textChanged( const QString &text )
 {
     downloader->file_path = text;
+}
+void DownloadInfDialog::on_SelectPathButton_clicked()
+{
+    QString path = QFileDialog::getExistingDirectory(this,"选择文件保存位置",".");
+    if(!path.isEmpty())
+    {
+        ui->SavePathLineEdit->setText(path);
+    }
+
 }

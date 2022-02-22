@@ -1,4 +1,5 @@
 QT       += core gui
+QT += network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -48,3 +49,6 @@ CONFIG(release,debug|release){
 DESTDIR = ./../release_bin
 LIBS += -L./../release_bin
 }
+
+
+
