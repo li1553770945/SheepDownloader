@@ -1,5 +1,5 @@
 # SheepDownloader
-[](https://img.shields.io/badge/qt-6.2.3-brightgreen)
+![](https://img.shields.io/badge/qt-6.2.3-brightgreen)
 一款基于QT的文件下载器，计划支持多线程、断点续传
 目前使用的IDM下载器，但是感觉界面不太符合个人习惯，而且是付费的，除非用破解版，因此想要开发自己的开源下载器。目前刚刚有一些简单想法，计划按照以下需求开发。如果有志同道合的朋友可以一起开发。
 
