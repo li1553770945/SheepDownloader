@@ -4,13 +4,21 @@
 #include <qmessagebox.h>
 #include "Downloader.h"
 #include "downloadinfdialog.h"
+#include "DownloadDeledate.h"
+#include <QStandardItem>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
-    InitConfig();
-    setting_window = NULL;
     ui->setupUi(this);
+    InitConfig();
+    model = new QStandardItemModel(this);
+    ui->DownloadList->setModel(model);
+    DownloadDeledate * deledate = new DownloadDeledate(this);
+    ui->DownloadList->setItemDelegate(deledate);
+    ReadDownloadList();
+    setting_window = NULL;
+
 }
 void MainWindow::InitConfig()
 {
@@ -52,7 +60,12 @@ void MainWindow::Download()
             DownloadInfDialog dialog(downloader,this);
             if(dialog.exec()==QDialog::Accepted)
             {
-                   downloader->Start();
+                downloader->Start();
+                QVariant variant;
+                variant.setValue(downloader);
+                QStandardItem *item = new QStandardItem();
+                item->setData(variant);
+                model->appendRow(item);
             }
 
         }
@@ -66,4 +79,12 @@ void MainWindow::Download()
 void MainWindow::on_DownloadButton_clicked()
 {
     Download();
+}
+void MainWindow::ReadDownloadList()
+{
+
+}
+void MainWindow::SaveDownloadList()
+{
+
 }

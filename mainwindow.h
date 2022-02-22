@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "settingwindow.h"
+#include <QStandardItemModel>
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -16,10 +17,13 @@ public:
     ~MainWindow();
 
 private:
+    QStandardItemModel* model;
     void InitConfig();
     void Download();
     Ui::MainWindow *ui;
     SettingWindow* setting_window;
+    void ReadDownloadList();
+    void SaveDownloadList();
 
 private slots:
     void on_SettingAction_triggered();

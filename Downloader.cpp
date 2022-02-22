@@ -15,8 +15,26 @@ Downloader::~Downloader()
 {
 
 }
-int Downloader::CreateFile()
+Downloader::Downloader(const Downloader &)
 {
+
+}
+
+int Downloader::Start()
+{
+    return 0;
+}
+int Downloader::GetFileNameFromUrl()
+{
+    return 0;
+}
+void Downloader::DownloadFinished(QNetworkReply * reply)
+{
+
+}
+int Downloader::CreateFile(bool create)
+{
+    file.close();
     QDir dir;
     dir.mkpath(file_path);
     QDir dir1(file_path);
@@ -32,12 +50,15 @@ int Downloader::CreateFile()
         file.setFileName(abs_file_name);
         i++;
     }
-    if (!file.open(QIODevice::WriteOnly))
+    if(create)
     {
-        QMessageBox box(QMessageBox::Critical, tr("错误"),
-                      tr("无法创建文件%1:%2").arg(abs_file_name,file.errorString()));
-        box.exec();
-        return -1;
+        if (!file.open(QIODevice::WriteOnly))
+        {
+            QMessageBox box(QMessageBox::Critical, tr("错误"),
+                          tr("无法创建文件%1:%2").arg(abs_file_name,file.errorString()));
+            box.exec();
+            return -1;
+        }
     }
     return 0;
 }
@@ -57,11 +78,7 @@ HttpDownloader::~HttpDownloader()
 int HttpDownloader::Start()
 {
     qDebug()<<"下载开始";
-    if(CreateFile()!=0)
-    {
-        QMessageBox box(QMessageBox::Critical,"错误","无法创建文件夹");
-        box.exec();
-    }
+    CreateFile(true);
     connect(
      &d_manager, SIGNAL (finished(QNetworkReply*)),
      this, SLOT (DownloadFinished(QNetworkReply*))
@@ -90,6 +107,7 @@ int HttpDownloader::GetFileNameFromUrl()   //从URL中获取文件名
     file_name = url1.fileName();
     if(file_name!="")
     {
+        CreateFile(false);
         return 0;
     }
     QNetworkAccessManager manager;
@@ -117,6 +135,7 @@ int HttpDownloader::GetFileNameFromUrl()   //从URL中获取文件名
     delete reply;
     qDebug()<<"filename:"<<filename;
     file_name = filename;
+    CreateFile(false);
     return 0;
 }
 void HttpDownloader::DownloadFinished(QNetworkReply* reply)
