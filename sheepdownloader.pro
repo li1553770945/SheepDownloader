@@ -52,5 +52,3 @@ DESTDIR = ./../release_bin
 LIBS += -L./../release_bin
 }
 
-
-

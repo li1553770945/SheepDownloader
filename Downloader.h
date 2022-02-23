@@ -12,22 +12,24 @@ public:
     QString file_path;
     QFile file;
     QString time;
-    int progress;
-    int state;
+    long long local_size;
+    long long total_size;
+    int status;
     Downloader();
     virtual ~Downloader();
     Downloader(const Downloader &);
     virtual int Start();
-//    virtual int StartDownloadThread() = 0;
-//    virtual long GetTotalFileLenth() = 0;             //获取将要下载的文件长度
-//    virtual long GetLocalFileLenth() = 0;         //获取本地文件长度
     virtual int GetFileNameFromUrl() ;      //从URL中获取文件名
     virtual int CreateFile(bool);       //创建文件，传入true表示在磁盘创建，否则只修改file变量
+    QString StatusString(); //当前状态
 public slots:
-    virtual void DownloadFinished(QNetworkReply * reply);
-
-
-
+    virtual void DownloadFinished();    //下载完成
+    virtual void ReadyRead();    //可以读取
+    virtual void DownloadProgress(qint64,qint64); //修改大小
+    virtual void Error(QNetworkReply::NetworkError code); //发生错误
+signals:
+    void PercentageChange(float); //发送当前百分比
+    void StatusChange(); //状态发生变化的信号
 };
 class HttpDownloader:public Downloader{
     Q_OBJECT
@@ -37,12 +39,14 @@ class HttpDownloader:public Downloader{
     HttpDownloader();
     ~HttpDownloader();
     int Start();
-    int StartDownloadThread() ;
-    long GetTotalFileLenth() ;
-    long GetLocalFileLenth() ;
     int GetFileNameFromUrl();
+
 public slots:
-    void DownloadFinished(QNetworkReply *);
+    void ReadyRead();
+    void DownloadFinished();
+    void DownloadProgress(qint64,qint64);
+    void Error(QNetworkReply::NetworkError code);
+
 };
 Q_DECLARE_METATYPE(Downloader*)
 #endif // DOWNLOADER_H

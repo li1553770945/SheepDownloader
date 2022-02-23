@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "settingwindow.h"
 #include <QStandardItemModel>
+#include "Downloader.h"
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -17,6 +18,7 @@ public:
     ~MainWindow();
 
 private:
+    Downloader * select_downloader;
     QStandardItemModel* model;
     void InitConfig();
     void Download();
@@ -28,5 +30,8 @@ private:
 private slots:
     void on_SettingAction_triggered();
     void on_DownloadButton_clicked();
+    void on_DownloadList_clicked (const QModelIndex &);
+    void SetProgressBar(float);
+    void ChangeStatus();
 };
 #endif // MAINWINDOW_H

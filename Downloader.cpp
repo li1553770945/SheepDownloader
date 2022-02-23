@@ -8,7 +8,7 @@
 #include <QDir>
 Downloader::Downloader()
 {
-
+    status = 0;
 }
 
 Downloader::~Downloader()
@@ -22,14 +22,51 @@ Downloader::Downloader(const Downloader &)
 
 int Downloader::Start()
 {
+    status = 1;
+    emit StatusChange();
     return 0;
 }
 int Downloader::GetFileNameFromUrl()
 {
     return 0;
 }
-void Downloader::DownloadFinished(QNetworkReply * reply)
+void Downloader::DownloadFinished()
 {
+    status = 3;
+    emit StatusChange();
+}
+void Downloader::ReadyRead()
+{
+
+}
+void Downloader::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
+{
+
+}
+void Downloader::Error(QNetworkReply::NetworkError code)
+{
+    status = -1;
+    emit StatusChange();
+}
+
+QString Downloader::StatusString()
+{
+    switch (status)
+    {
+    case -1:
+        return "错误";
+    case 0:
+        return "创建项目";
+    case 1:
+        return "下载中";
+    case 2:
+        return "暂停";
+    case 3:
+        return "已完成";
+    default:
+        return "未知";
+    }
+
 
 }
 int Downloader::CreateFile(bool create)
@@ -47,7 +84,7 @@ int Downloader::CreateFile(bool create)
 
         file_name = info.completeBaseName() + "(" +QString::number(i)+ ")." +info.suffix();
         QString abs_file_name = dir1.absoluteFilePath(file_name);
-        file.setFileName(abs_file_name);
+        file.setFileName(abs_file_name);//为了检测file.exists()
         i++;
     }
     if(create)
@@ -65,7 +102,7 @@ int Downloader::CreateFile(bool create)
 
 HttpDownloader::HttpDownloader()
 {
-    state = 0;
+
 }
 
 HttpDownloader::~HttpDownloader()
@@ -77,28 +114,16 @@ HttpDownloader::~HttpDownloader()
 }
 int HttpDownloader::Start()
 {
+    Downloader::Start();
     qDebug()<<"下载开始";
     CreateFile(true);
-    connect(
-     &d_manager, SIGNAL (finished(QNetworkReply*)),
-     this, SLOT (DownloadFinished(QNetworkReply*))
-    );
-
     QUrl url1(url);
     QNetworkRequest request(url1);
-    d_manager.get(request);
-    return 0;
-}
-int HttpDownloader::StartDownloadThread()
-{
-    return 0;
-}
-long HttpDownloader::GetTotalFileLenth() //获取将要下载的文件长度
-{
-    return 0;
-}
-long HttpDownloader::GetLocalFileLenth()//获取本地文件长度
-{
+    d_reply=d_manager.get(request);
+    connect(d_reply,SIGNAL(readyRead()),this,SLOT(ReadyRead()));                //可读
+    connect(d_reply,SIGNAL(finished()),this,SLOT(DownloadFinished()));                  //结束
+    connect(d_reply,SIGNAL(downloadProgress(qint64,qint64)),this,SLOT(DownloadProgress(qint64,qint64)));   //大小
+    connect(d_reply,SIGNAL(errorOccurred(QNetworkReply::NetworkError)),this,SLOT(Error(QNetworkReply::NetworkError)));  //异常
     return 0;
 }
 int HttpDownloader::GetFileNameFromUrl()   //从URL中获取文件名
@@ -138,9 +163,28 @@ int HttpDownloader::GetFileNameFromUrl()   //从URL中获取文件名
     CreateFile(false);
     return 0;
 }
-void HttpDownloader::DownloadFinished(QNetworkReply* reply)
+void HttpDownloader::DownloadFinished()
 {
     qDebug()<<"下载完成";
-    file.write(reply->readAll());
+
+    Downloader::DownloadFinished();
     file.close();
+}
+void HttpDownloader::ReadyRead()
+{
+    Downloader::ReadyRead();
+    file.write(d_reply->readAll());
+}
+
+void HttpDownloader::DownloadProgress(qint64 bytesReceived, qint64 bytesTotal)
+{
+    local_size = bytesReceived;
+    total_size = bytesTotal;
+    emit PercentageChange(bytesReceived*1.0/bytesTotal*100);
+}
+void HttpDownloader::Error(QNetworkReply::NetworkError code)
+{
+    Downloader::Error(code);
+    QMessageBox box(QMessageBox::Critical,"错误","网络错误"+d_reply->errorString());
+    box.exec();
 }

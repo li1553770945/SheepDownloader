@@ -12,13 +12,16 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     InitConfig();
+
     model = new QStandardItemModel(this);
     ui->DownloadList->setModel(model);
     DownloadDeledate * deledate = new DownloadDeledate(this);
     ui->DownloadList->setItemDelegate(deledate);
-    ReadDownloadList();
-    setting_window = NULL;
 
+    ReadDownloadList();
+
+    select_downloader = NULL;
+    setting_window = NULL;
 }
 void MainWindow::InitConfig()
 {
@@ -87,4 +90,29 @@ void MainWindow::ReadDownloadList()
 void MainWindow::SaveDownloadList()
 {
 
+}
+void MainWindow::on_DownloadList_clicked (const QModelIndex &index)
+{
+    QVariant var = index.data(Qt::UserRole+1);
+    Downloader* item_data = var.value<Downloader*>();//拿到原始数据，和放进去的时候必须对应
+    if(select_downloader!=NULL)
+    {
+        disconnect(select_downloader,SIGNAL(PercentageChange(float)),this,SLOT(SetProgressBar(float)));
+        disconnect(select_downloader,SIGNAL(StatusChange()),this,SLOT(ChangeStatus()));
+    }
+    select_downloader = item_data;
+    connect(select_downloader,SIGNAL(PercentageChange(float)),this,SLOT(SetProgressBar(float)));
+    connect(select_downloader,SIGNAL(StatusChange()),this,SLOT(ChangeStatus()));
+    ui->FileName->setText(item_data->file_name);
+    ui->URL->setText(item_data->url);
+    ui->SavePath->setText(item_data->file_path);
+    ui->Status->setText(item_data->StatusString());
+}
+void MainWindow::SetProgressBar(float percentage)
+{
+    ui->ProgressBar->setValue(percentage);
+}
+void MainWindow::ChangeStatus()
+{
+    ui->Status->setText(select_downloader->StatusString());
 }
